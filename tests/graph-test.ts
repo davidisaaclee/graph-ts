@@ -1,4 +1,4 @@
-import * as Graph from '../index';
+import * as Graph from '../src/graph';
 import * as graphs from './fixtures/graphs';
 
 test('library imports members', () => {

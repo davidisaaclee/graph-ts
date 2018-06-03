@@ -1,4 +1,4 @@
-import { Graph } from '../../index';
+import { Graph } from '../../src/graph';
 
 export const graph1: Graph<number, null> = {
 	nodes: {

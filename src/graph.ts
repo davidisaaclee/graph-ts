@@ -36,7 +36,6 @@ export function edgesWithDestination<Node, EdgeMetadata>(
 	return result;
 }
 
-/*
 export type ExecutionStep = {
 	nodeKey: string,
 	edges: Array<{ edgeKey: string, beginsCycle: boolean }>
@@ -55,8 +54,10 @@ export function resolveDependencies<Node>(
 		newSeen.add(nodeKey);
 
 		let edges = [];
-		for (const edgeKey of edgesWithSource(nodeKey, graph)) {
-			const dst = graph.edges[edgeKey].dst;
+		const edgesFromCurrentNode =
+			edgesWithSource(nodeKey, graph);
+		for (const edgeKey of Object.keys(edgesFromCurrentNode)) {
+			const dst = edgesFromCurrentNode[edgeKey].dst;
 			const beginsCycle = newSeen.has(dst);
 
 			if (!resolved.has(dst)) {
@@ -76,7 +77,3 @@ export function resolveDependencies<Node>(
 
 	return steps;
 }
-*/
-
-
-

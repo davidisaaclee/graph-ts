@@ -1,10 +1,13 @@
 {
-  "name": "graph",
+  "name": "@davidisaaclee/graph",
   "version": "0.1.0",
   "description": "A TypeScript graph interface",
-  "main": "index.js",
+  "main": "dist/graph.js",
+	"module": "dist/graph.js",
+	"types": "dist/graph.d.ts",
   "scripts": {
     "build": "tsc",
+		"preprocess": "npm run build",
     "test": "jest"
   },
   "keywords": [],
@@ -31,7 +34,7 @@
       }
     },
     "testMatch": [
-      "**/__tests__/*.+(ts|tsx|js)"
+      "**/tests/*.+(ts|tsx|js)"
     ]
   }
 }
