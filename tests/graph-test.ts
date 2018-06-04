@@ -48,3 +48,18 @@ test('finds edges with specified source', () => {
 			},
 		});
 });
+
+test('transforms nodes using mapNodes', () => {
+	const transformed: Graph.Graph<string, null> =
+		Graph.mapNodes(
+			graphs.graph1,
+			(node: number) => `Value: ${node}`);
+
+	expect(transformed.nodes)
+		.toEqual({
+			'a': "Value: 0",
+			'b': "Value: 1",
+			'c': "Value: 2",
+		});
+
+});

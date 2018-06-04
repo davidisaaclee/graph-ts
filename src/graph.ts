@@ -77,3 +77,17 @@ export function resolveDependencies<Node>(
 
 	return steps;
 }
+
+export function mapNodes<TransformedNode, OriginalNode, EdgeMetadata>(
+	graph: Graph<OriginalNode, EdgeMetadata>,
+	transform: (original: OriginalNode) => TransformedNode,
+): Graph<TransformedNode, EdgeMetadata> {
+	return {
+		nodes: Object.keys(graph.nodes)
+			.reduce((acc, key) => {
+				acc[key] = transform(graph.nodes[key]);
+				return acc;
+			}, {} as { [key: string]: TransformedNode }),
+		edges: graph.edges
+	};
+}
