@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "description": "A TypeScript graph interface",
   "main": "dist/graph.js",
-	"module": "dist/graph.js",
-	"types": "dist/graph.d.ts",
+  "module": "dist/graph.js",
+  "types": "dist/graph.d.ts",
   "scripts": {
     "build": "tsc",
-		"preprocess": "npm run build",
+    "preprocess": "npm run build",
     "test": "jest"
   },
   "keywords": [],
@@ -15,11 +15,12 @@
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^23.0.0",
+    "@types/lodash": "^4.14.109",
     "jest": "^23.1.0",
     "ts-jest": "^22.4.6",
     "typescript": "^2.9.1"
   },
-	"jest": {
+  "jest": {
     "moduleFileExtensions": [
       "ts",
       "tsx",
@@ -36,5 +37,8 @@
     "testMatch": [
       "**/tests/*.+(ts|tsx|js)"
     ]
+  },
+  "dependencies": {
+    "lodash": "^4.17.10"
   }
 }

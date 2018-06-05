@@ -1,4 +1,5 @@
 import { setDifference } from './setDifference';
+import { omit } from 'lodash';
 
 type Edge<EdgeMetadata> = { src: string, dst: string, metadata: EdgeMetadata };
 export interface Graph<Node, EdgeMetadata> {
@@ -94,7 +95,7 @@ export function mapNodes<TransformedNode, OriginalNode, EdgeMetadata>(
 
 export function mapEdges<TransformedEdgeWeight, OriginalEdgeWeight, Node>(
 	graph: Graph<Node, OriginalEdgeWeight>,
-	transform: (original: OriginalEdgeWeight) => TransformedEdgeWeight,
+	transform: (original: OriginalEdgeWeight, src: string, dst: string) => TransformedEdgeWeight,
 ): Graph<Node, TransformedEdgeWeight> {
 	return {
 		nodes: graph.nodes,
@@ -102,10 +103,48 @@ export function mapEdges<TransformedEdgeWeight, OriginalEdgeWeight, Node>(
 			.reduce((acc, key) => {
 				acc[key] = {
 					...graph.edges[key],
-					metadata: transform(graph.edges[key].metadata)
+					metadata: transform(graph.edges[key].metadata, graph.edges[key].src, graph.edges[key].dst)
 				};
 				return acc;
 			}, {} as { [key: string]: { src: string, dst: string, metadata: TransformedEdgeWeight } }),
+	};
+}
+
+export function findEdge<Node, EdgeMetadata>(
+	graph: Graph<Node, EdgeMetadata>,
+	predicate: (metadata: Edge<EdgeMetadata>) => boolean
+): string | null {
+	const retval = Object.keys(graph.edges)
+		.find(key => predicate(graph.edges[key]));
+
+	if (retval == null) {
+		return null;
+	} else {
+		return retval;
+	}
+}
+
+export function insertEdge<Node, EdgeMetadata>(
+	graph: Graph<Node, EdgeMetadata>,
+	edge: Edge<EdgeMetadata>,
+	key: string
+): Graph<Node, EdgeMetadata> {
+	return {
+		...graph,
+		edges: {
+			...graph.edges,
+			[key]: edge
+		}
+	};
+}
+
+export function removeEdge<Node, EdgeMetadata>(
+	graph: Graph<Node, EdgeMetadata>,
+	keyToRemove: string
+): Graph<Node, EdgeMetadata> {
+	return {
+		...graph,
+		edges: omit(graph.edges, keyToRemove)
 	};
 }
 
