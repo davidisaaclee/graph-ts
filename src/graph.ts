@@ -91,3 +91,21 @@ export function mapNodes<TransformedNode, OriginalNode, EdgeMetadata>(
 		edges: graph.edges
 	};
 }
+
+export function mapEdges<TransformedEdgeWeight, OriginalEdgeWeight, Node>(
+	graph: Graph<Node, OriginalEdgeWeight>,
+	transform: (original: OriginalEdgeWeight) => TransformedEdgeWeight,
+): Graph<Node, TransformedEdgeWeight> {
+	return {
+		nodes: graph.nodes,
+		edges: Object.keys(graph.edges)
+			.reduce((acc, key) => {
+				acc[key] = {
+					...graph.edges[key],
+					metadata: transform(graph.edges[key].metadata)
+				};
+				return acc;
+			}, {} as { [key: string]: { src: string, dst: string, metadata: TransformedEdgeWeight } }),
+	};
+}
+
