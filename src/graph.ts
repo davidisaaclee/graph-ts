@@ -1,5 +1,5 @@
 import { setDifference } from './setDifference';
-import { omit } from 'lodash';
+import { omit, pickBy } from 'lodash';
 
 type Edge<EdgeMetadata> = { src: string, dst: string, metadata: EdgeMetadata };
 export interface Graph<Node, EdgeMetadata> {
@@ -146,5 +146,12 @@ export function removeEdge<Node, EdgeMetadata>(
 		...graph,
 		edges: omit(graph.edges, keyToRemove)
 	};
+}
+
+export function filterEdges<Node, EdgeMetadata>(
+	graph: Graph<Node, EdgeMetadata>,
+	predicate: (metadata: Edge<EdgeMetadata>) => boolean
+): { [edgeKey: string]: Edge<EdgeMetadata> } {
+	return pickBy(graph.edges, edge => predicate(edge)) as Record<string, Edge<EdgeMetadata>>;
 }
 
