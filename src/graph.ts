@@ -155,3 +155,16 @@ export function filterEdges<Node, EdgeMetadata>(
 	return pickBy(graph.edges, edge => predicate(edge)) as Record<string, Edge<EdgeMetadata>>;
 }
 
+export function insertNode<Node, EdgeMetadata>(
+	graph: Graph<Node, EdgeMetadata>,
+	node: Node,
+	key: string
+): Graph<Node, EdgeMetadata> {
+	return {
+		...graph,
+		nodes: {
+			...graph.nodes,
+			[key]: node
+		}
+	};
+}
