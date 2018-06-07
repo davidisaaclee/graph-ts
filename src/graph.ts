@@ -1,7 +1,7 @@
 import { setDifference } from './setDifference';
 import { omit, pickBy } from 'lodash';
 
-type Edge<EdgeMetadata> = { src: string, dst: string, metadata: EdgeMetadata };
+export type Edge<EdgeMetadata> = { src: string, dst: string, metadata: EdgeMetadata };
 export interface Graph<Node, EdgeMetadata> {
 	nodes: { [key: string]: Node };
 	edges: { [key: string]: Edge<EdgeMetadata> };
