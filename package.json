@@ -5,9 +5,10 @@
   "main": "dist/graph.js",
   "module": "dist/graph.js",
   "types": "dist/graph.d.ts",
+	"files": ["src", "dist"],
   "scripts": {
     "build": "tsc",
-		"clean": "rimraf dist",
+    "clean": "rimraf dist",
     "preprocess": "npm run clean && npm run build",
     "test": "jest"
   },
@@ -41,6 +42,7 @@
     ]
   },
   "dependencies": {
-    "lodash": "^4.17.10"
+    "lodash": "^4.17.10",
+    "npm": "^6.1.0"
   }
 }
