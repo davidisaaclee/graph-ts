@@ -1,6 +1,6 @@
 {
   "name": "@davidisaaclee/graph",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A TypeScript graph interface",
   "main": "dist/graph.js",
   "module": "dist/graph.js",
