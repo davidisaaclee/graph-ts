@@ -1,11 +1,14 @@
 {
   "name": "@davidisaaclee/graph",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A TypeScript graph interface",
   "main": "dist/graph.js",
   "module": "dist/graph.js",
   "types": "dist/graph.d.ts",
-	"files": ["src", "dist"],
+  "files": [
+    "src",
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "clean": "rimraf dist",
