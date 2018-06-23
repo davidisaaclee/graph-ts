@@ -1,5 +1,5 @@
 import { setDifference } from './setDifference';
-import { omit, pickBy } from 'lodash';
+import { omit, pickBy, mapKeys } from 'lodash';
 
 export type Edge<EdgeMetadata> = { src: string, dst: string, metadata: EdgeMetadata };
 export interface Graph<Node, EdgeMetadata> {
@@ -231,3 +231,24 @@ export function merge<N, E>(
 		}
 	};
 }
+
+export function transformNodeKeys<N, E>(
+	graph: Graph<N, E>,
+	transformKey: (nodeKey: string) => string
+): Graph<N, E> {
+	return {
+		...graph,
+		_nodes: mapKeys(graph._nodes, (_, key) => transformKey(key))
+	};
+}
+
+export function transformEdgeKeys<N, E>(
+	graph: Graph<N, E>,
+	transformKey: (edgeKey: string) => string
+): Graph<N, E> {
+	return {
+		...graph,
+		_edges: mapKeys(graph._edges, (_, key) => transformKey(key))
+	};
+}
+
