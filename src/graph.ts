@@ -215,3 +215,19 @@ export function mutateNode<Node, EdgeMetadata>(
 		}
 	};
 }
+
+export function merge<N, E>(
+	g1: Graph<N, E>,
+	g2: Graph<N, E>
+): Graph<N, E> {
+	return {
+		_nodes: {
+			...g1._nodes,
+			...g2._nodes,
+		},
+		_edges: {
+			...g1._edges,
+			...g2._edges,
+		}
+	};
+}
