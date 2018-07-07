@@ -145,13 +145,8 @@ export function insertEdge<Node, EdgeMetadata>(
 	edge: Edge<EdgeMetadata>,
 	key: string
 ): Graph<Node, EdgeMetadata> {
-	return {
-		...graph,
-		_edges: {
-			...graph._edges,
-			[key]: edge
-		}
-	};
+	graph._edges[key] = edge;
+	return graph;
 }
 
 export function insertNode<Node, EdgeMetadata>(
@@ -159,23 +154,16 @@ export function insertNode<Node, EdgeMetadata>(
 	node: Node,
 	key: string
 ): Graph<Node, EdgeMetadata> {
-	return {
-		...graph,
-		_nodes: {
-			...graph._nodes,
-			[key]: node
-		}
-	};
+	graph._nodes[key] = node;
+	return graph;
 }
 
 export function removeEdge<Node, EdgeMetadata>(
 	graph: Graph<Node, EdgeMetadata>,
 	keyToRemove: string
 ): Graph<Node, EdgeMetadata> {
-	return {
-		...graph,
-		_edges: omit(graph._edges, keyToRemove)
-	};
+	delete graph._edges[keyToRemove];
+	return graph;
 }
 
 export function mutateNode<Node, EdgeMetadata>(
@@ -183,50 +171,40 @@ export function mutateNode<Node, EdgeMetadata>(
 	nodeKey: string,
 	transform: (original: Node) => Node
 ): Graph<Node, EdgeMetadata> {
-	if (graph._nodes[nodeKey] == null) {
-		return graph;
+	if (graph._nodes[nodeKey] != null) {
+		graph._nodes[nodeKey] = transform(graph._nodes[nodeKey]);
 	}
 
-	return {
-		...graph,
-		_nodes: {
-			...graph._nodes,
-			[nodeKey]: transform(graph._nodes[nodeKey])
-		}
-	};
+	return graph;
 }
 
 export function mapNodes<TransformedNode, OriginalNode, EdgeMetadata>(
 	graph: Graph<OriginalNode, EdgeMetadata>,
+	outputGraph: Graph<TransformedNode, EdgeMetadata>,
 	transform: (original: OriginalNode) => TransformedNode,
 ): Graph<TransformedNode, EdgeMetadata> {
-	return {
-		_nodes: Object.keys(graph._nodes)
-			.reduce((acc, key) => {
-				acc[key] = transform(graph._nodes[key]);
-				return acc;
-			}, {} as { [key: string]: TransformedNode }),
-		_edges: graph._edges
-	};
+	for (const key of Object.keys(graph._nodes)) {
+		outputGraph._nodes[key] = transform(graph._nodes[key]) as any;
+	}
+	return outputGraph;
 }
 
 export function mapEdges<TransformedEdgeWeight, OriginalEdgeWeight, Node>(
 	graph: Graph<Node, OriginalEdgeWeight>,
+	outputGraph: Graph<Node, TransformedEdgeWeight>,
 	transform: (original: OriginalEdgeWeight, src: string, dst: string) => TransformedEdgeWeight,
 ): Graph<Node, TransformedEdgeWeight> {
-	return {
-		_nodes: graph._nodes,
-		_edges: Object.keys(graph._edges)
-			.reduce((acc, key) => {
-				acc[key] = {
-					...graph._edges[key],
-					metadata: transform(graph._edges[key].metadata, graph._edges[key].src, graph._edges[key].dst)
-				};
-				return acc;
-			}, {} as { [key: string]: { src: string, dst: string, metadata: TransformedEdgeWeight } }),
-	};
+	for (const key of Object.keys(graph._nodes)) {
+		const edge = graph._edges[key];
+		outputGraph._edges[key] = {
+			...edge,
+			metadata: transform(edge.metadata, edge.src, edge.dst)
+		};
+	}
+	return outputGraph;
 }
 
+// TODO: Make this produce less garbage
 export function transformNodeKeys<N, E>(
 	graph: Graph<N, E>,
 	transformKey: (nodeKey: string) => string
@@ -241,6 +219,7 @@ export function transformNodeKeys<N, E>(
 	};
 }
 
+// TODO: Make this produce less garbage
 export function transformEdgeKeys<N, E>(
 	graph: Graph<N, E>,
 	transformKey: (edgeKey: string) => string
@@ -251,19 +230,21 @@ export function transformEdgeKeys<N, E>(
 	};
 }
 
+// Mutates first argument.
 export function merge<N, E>(
 	g1: Graph<N, E>,
 	g2: Graph<N, E>
 ): Graph<N, E> {
-	return {
-		_nodes: {
-			...g1._nodes,
-			...g2._nodes,
-		},
-		_edges: {
-			...g1._edges,
-			...g2._edges,
-		}
-	};
+	const nodes = allNodes(g2);
+	for (const key of Object.keys(nodes)) {
+		insertNode(g1, nodes[key], key);
+	}
+
+	const edges = allEdges(g2);
+	for (const key of Object.keys(edges)) {
+		insertEdge(g1, edges[key], key);
+	}
+
+	return g1;
 }
 
