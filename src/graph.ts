@@ -8,7 +8,7 @@ export interface Graph<Node, EdgeMetadata> {
 }
 
 
-export const empty = Object.freeze({ _nodes: {}, _edges: {} });
+export const empty = () => ({ _nodes: {}, _edges: {} });
 
 // Returns a shallow clone of the input graph.
 export function clone<N, E>(graph: Graph<N, E>): Graph<N, E> {
