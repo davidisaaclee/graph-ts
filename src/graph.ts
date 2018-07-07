@@ -7,7 +7,37 @@ export interface Graph<Node, EdgeMetadata> {
 	_edges: { [key: string]: Edge<EdgeMetadata> };
 }
 
+
 export const empty = Object.freeze({ _nodes: {}, _edges: {} });
+
+
+// -- Accessors
+
+export function nodeForKey<Node, EdgeMetadata>(
+	graph: Graph<Node, EdgeMetadata>,
+	key: string
+): Node | null {
+	return graph._nodes[key];
+}
+
+export function edgeForKey<Node, EdgeMetadata>(
+	graph: Graph<Node, EdgeMetadata>,
+	key: string
+): Edge<EdgeMetadata> | null {
+	return graph._edges[key];
+}
+
+export function allEdges<Node, EdgeMetadata>(
+	graph: Graph<Node, EdgeMetadata>
+): Record<string, Edge<EdgeMetadata>> {
+	return graph._edges;
+}
+
+export function allNodes<Node, EdgeMetadata>(
+	graph: Graph<Node, EdgeMetadata>
+): Record<string, Node> {
+	return graph._nodes;
+}
 
 export function edgesWithSource<Node, EdgeMetadata>(
 	srcKey: string,
@@ -37,6 +67,27 @@ export function edgesWithDestination<Node, EdgeMetadata>(
 	}
 
 	return result;
+}
+
+export function findEdge<Node, EdgeMetadata>(
+	graph: Graph<Node, EdgeMetadata>,
+	predicate: (metadata: Edge<EdgeMetadata>) => boolean
+): string | null {
+	const retval = Object.keys(graph._edges)
+		.find(key => predicate(graph._edges[key]));
+
+	if (retval == null) {
+		return null;
+	} else {
+		return retval;
+	}
+}
+
+export function filterEdges<Node, EdgeMetadata>(
+	graph: Graph<Node, EdgeMetadata>,
+	predicate: (metadata: Edge<EdgeMetadata>) => boolean
+): { [edgeKey: string]: Edge<EdgeMetadata> } {
+	return pickBy(graph._edges, edge => predicate(edge)) as Record<string, Edge<EdgeMetadata>>;
 }
 
 export type ExecutionStep = {
@@ -81,6 +132,65 @@ export function resolveDependencies<Node>(
 	return steps;
 }
 
+
+// -- Mutations
+
+export function insertEdge<Node, EdgeMetadata>(
+	graph: Graph<Node, EdgeMetadata>,
+	edge: Edge<EdgeMetadata>,
+	key: string
+): Graph<Node, EdgeMetadata> {
+	return {
+		...graph,
+		_edges: {
+			...graph._edges,
+			[key]: edge
+		}
+	};
+}
+
+export function insertNode<Node, EdgeMetadata>(
+	graph: Graph<Node, EdgeMetadata>,
+	node: Node,
+	key: string
+): Graph<Node, EdgeMetadata> {
+	return {
+		...graph,
+		_nodes: {
+			...graph._nodes,
+			[key]: node
+		}
+	};
+}
+
+export function removeEdge<Node, EdgeMetadata>(
+	graph: Graph<Node, EdgeMetadata>,
+	keyToRemove: string
+): Graph<Node, EdgeMetadata> {
+	return {
+		...graph,
+		_edges: omit(graph._edges, keyToRemove)
+	};
+}
+
+export function mutateNode<Node, EdgeMetadata>(
+	graph: Graph<Node, EdgeMetadata>,
+	nodeKey: string,
+	transform: (original: Node) => Node
+): Graph<Node, EdgeMetadata> {
+	if (graph._nodes[nodeKey] == null) {
+		return graph;
+	}
+
+	return {
+		...graph,
+		_nodes: {
+			...graph._nodes,
+			[nodeKey]: transform(graph._nodes[nodeKey])
+		}
+	};
+}
+
 export function mapNodes<TransformedNode, OriginalNode, EdgeMetadata>(
 	graph: Graph<OriginalNode, EdgeMetadata>,
 	transform: (original: OriginalNode) => TransformedNode,
@@ -112,126 +222,6 @@ export function mapEdges<TransformedEdgeWeight, OriginalEdgeWeight, Node>(
 	};
 }
 
-export function findEdge<Node, EdgeMetadata>(
-	graph: Graph<Node, EdgeMetadata>,
-	predicate: (metadata: Edge<EdgeMetadata>) => boolean
-): string | null {
-	const retval = Object.keys(graph._edges)
-		.find(key => predicate(graph._edges[key]));
-
-	if (retval == null) {
-		return null;
-	} else {
-		return retval;
-	}
-}
-
-export function insertEdge<Node, EdgeMetadata>(
-	graph: Graph<Node, EdgeMetadata>,
-	edge: Edge<EdgeMetadata>,
-	key: string
-): Graph<Node, EdgeMetadata> {
-	return {
-		...graph,
-		_edges: {
-			...graph._edges,
-			[key]: edge
-		}
-	};
-}
-
-export function removeEdge<Node, EdgeMetadata>(
-	graph: Graph<Node, EdgeMetadata>,
-	keyToRemove: string
-): Graph<Node, EdgeMetadata> {
-	return {
-		...graph,
-		_edges: omit(graph._edges, keyToRemove)
-	};
-}
-
-export function filterEdges<Node, EdgeMetadata>(
-	graph: Graph<Node, EdgeMetadata>,
-	predicate: (metadata: Edge<EdgeMetadata>) => boolean
-): { [edgeKey: string]: Edge<EdgeMetadata> } {
-	return pickBy(graph._edges, edge => predicate(edge)) as Record<string, Edge<EdgeMetadata>>;
-}
-
-export function edgeForKey<Node, EdgeMetadata>(
-	graph: Graph<Node, EdgeMetadata>,
-	key: string
-): Edge<EdgeMetadata> | null {
-	return graph._edges[key];
-}
-
-export function allEdges<Node, EdgeMetadata>(
-	graph: Graph<Node, EdgeMetadata>
-): Record<string, Edge<EdgeMetadata>> {
-	return graph._edges;
-}
-
-
-export function insertNode<Node, EdgeMetadata>(
-	graph: Graph<Node, EdgeMetadata>,
-	node: Node,
-	key: string
-): Graph<Node, EdgeMetadata> {
-	return {
-		...graph,
-		_nodes: {
-			...graph._nodes,
-			[key]: node
-		}
-	};
-}
-
-export function nodeForKey<Node, EdgeMetadata>(
-	graph: Graph<Node, EdgeMetadata>,
-	key: string
-): Node | null {
-	return graph._nodes[key];
-}
-
-export function allNodes<Node, EdgeMetadata>(
-	graph: Graph<Node, EdgeMetadata>
-): Record<string, Node> {
-	return graph._nodes;
-}
-
-export function mutateNode<Node, EdgeMetadata>(
-	graph: Graph<Node, EdgeMetadata>,
-	nodeKey: string,
-	transform: (original: Node) => Node
-): Graph<Node, EdgeMetadata> {
-	if (graph._nodes[nodeKey] == null) {
-		return graph;
-	}
-
-	return {
-		...graph,
-		_nodes: {
-			...graph._nodes,
-			[nodeKey]: transform(graph._nodes[nodeKey])
-		}
-	};
-}
-
-export function merge<N, E>(
-	g1: Graph<N, E>,
-	g2: Graph<N, E>
-): Graph<N, E> {
-	return {
-		_nodes: {
-			...g1._nodes,
-			...g2._nodes,
-		},
-		_edges: {
-			...g1._edges,
-			...g2._edges,
-		}
-	};
-}
-
 export function transformNodeKeys<N, E>(
 	graph: Graph<N, E>,
 	transformKey: (nodeKey: string) => string
@@ -253,6 +243,22 @@ export function transformEdgeKeys<N, E>(
 	return {
 		...graph,
 		_edges: mapKeys(graph._edges, (_, key) => transformKey(key))
+	};
+}
+
+export function merge<N, E>(
+	g1: Graph<N, E>,
+	g2: Graph<N, E>
+): Graph<N, E> {
+	return {
+		_nodes: {
+			...g1._nodes,
+			...g2._nodes,
+		},
+		_edges: {
+			...g1._edges,
+			...g2._edges,
+		}
 	};
 }
 
